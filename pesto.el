@@ -67,7 +67,7 @@
 (define-key pesto-mode-keymap (kbd "C-ö")     'pesto-insert-and-indent-after)
 (define-key pesto-mode-keymap (kbd "C-c C-f") 'pesto-copy-line-and-insert-after)
 
-(define-minor-mode pesto-mode
+(define-minor-mode pesto-mode nil
   :keymap pesto-mode-keymap)
 
 (define-global-minor-mode pesto-globalized-mode pesto-mode
