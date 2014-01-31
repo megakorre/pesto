@@ -59,13 +59,57 @@
     (next-line)
     (move-to-column c)))
 
+(defun pesto-yank-and-indent ()
+  "Yank and then indent the newly formed region according to mode."
+  (interactive)
+  (yank)
+  (call-interactively 'indent-region)
+  (backward-char))
+
+(defun pesto-delete-parent-sexp ()
+  (interactive)
+  (backward-up-list)
+  (mark-sexp)
+  (paredit-backward-delete)
+  (delete-indentation))
+
+(defun pesto-clone-parent-sexp ()
+  (interactive)
+  (let ((c (current-column)))
+    (unless mark-active
+      (backward-up-list)
+      (mark-sexp))
+    (call-interactively 'kill-ring-save)
+    (call-interactively 'pop-to-mark-command)
+    (paredit-newline)
+    (yank)
+    (call-interactively 'pop-to-mark-command)
+    (move-to-column c)))
+
+(defun pesto-delete-previus-line ()
+  (interactive)
+  (save-excursion
+    (previous-line)
+    (kill-whole-line)))
+
+(defun pesto-delete-next-line ()
+  (interactive)
+  (save-excursion
+    (next-line)
+    (kill-whole-line)))
+
 (defvar pesto-mode-keymap (make-sparse-keymap))
 
-(define-key pesto-mode-keymap (kbd "C-t")     'pesto-mark-line-and-down)
-(define-key pesto-mode-keymap (kbd "C-a")     'pesto-move-to-begining-of-code)
-(define-key pesto-mode-keymap (kbd "C-l")     'pesto-insert-and-indent-before)
-(define-key pesto-mode-keymap (kbd "C-ö")     'pesto-insert-and-indent-after)
-(define-key pesto-mode-keymap (kbd "C-c C-f") 'pesto-copy-line-and-insert-after)
+(define-key pesto-mode-keymap (kbd "C-t")		'pesto-mark-line-and-down)
+(define-key pesto-mode-keymap (kbd "C-a")		'pesto-move-to-begining-of-code)
+(define-key pesto-mode-keymap (kbd "C-l")		'pesto-insert-and-indent-before)
+(define-key pesto-mode-keymap (kbd "C-ö")		'pesto-insert-and-indent-after)
+(define-key pesto-mode-keymap (kbd "C-c C-f")		'pesto-copy-line-and-insert-after)
+(define-key pesto-mode-keymap (kbd "C-M-y")		'pesto-yank-and-indent)
+(define-key pesto-mode-keymap (kbd "C-c <down>")	'pesto-delete-next-line)
+(define-key pesto-mode-keymap (kbd "C-c <up>")		'pesto-delete-previus-line)
+(define-key pesto-mode-keymap (kbd "C-c C-v")		'pesto-clone-parent-sexp)
+(define-key pesto-mode-keymap (kbd "C-c C-d")		'pesto-delete-parent-sexp)
 
 (define-minor-mode pesto-mode nil
   :keymap pesto-mode-keymap)
